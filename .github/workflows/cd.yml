@@ -3,14 +3,10 @@ name: CD - Deploy
 on:
   push:
     branches: [main]
-  workflow_run:
-    workflows: [CI - Test & Build]
-    types: [completed]
-    branches: [main]
+  workflow_dispatch:
 
 jobs:
   deploy:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to server via SSH
@@ -20,8 +16,19 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd /opt/tipshub
-            git pull origin main
-            docker-compose down
+            # Check if directory exists, if not clone
+            if [ ! -d /opt/tipshub ]; then
+              echo "Cloning repository..."
+              git clone git@github.com:nekwasar/tipshub.git /opt/tipshub
+              cd /opt/tipshub
+              cp .env.example .env
+            else
+              echo "Pulling latest changes..."
+              cd /opt/tipshub
+              git pull origin main
+            fi
+            
+            # Build and start containers
+            docker-compose down || true
             docker-compose up -d --build
             docker system prune -f

@@ -16,19 +16,9 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            # Check if directory exists, if not clone
-            if [ ! -d /opt/tipshub ]; then
-              echo "Cloning repository..."
-              git clone git@github.com:nekwasar/tipshub.git /opt/tipshub
-              cd /opt/tipshub
-              cp .env.example .env
-            else
-              echo "Pulling latest changes..."
-              cd /opt/tipshub
-              git pull origin main
-            fi
-            
-            # Build and start containers
+            cd /opt/tipshub
+            git config --global --add safe.directory /opt/tipshub
+            git pull origin main
             docker-compose down || true
-            docker-compose up -d --build
+            docker-compose up -d --build --pull never
             docker system prune -f

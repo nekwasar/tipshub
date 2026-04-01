@@ -124,7 +124,7 @@ function App() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1 }}
-              className={`font-mono text-6xl md:text-7xl lg:text-8xl font-medium tracking-tight mb-8 leading-none`}
+              className={`font-mono text-6xl md:text-7xl lg:text-8xl font-medium tracking-tight mb-8 leading-none ${isDark ? 'text-white' : 'text-black'}`}
             >
               <span className="block">EARN.</span>
               <span className={`block ${isDark ? 'text-white/30' : 'text-black/30'}`}>DIRECTORY.</span>

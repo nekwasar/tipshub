@@ -1,368 +1,183 @@
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { 
-  Search, 
-  DollarSign, 
-  Globe, 
-  Clock, 
-  ChevronRight, 
-  Mail,
-  Menu,
-  X,
-  ExternalLink,
-  TrendingUp,
-  CreditCard,
-  Gift,
-  Video,
-  CheckCircle,
-  Star
-} from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { motion, useScroll, useTransform } from 'framer-motion'
 
 function App() {
-  const [email, setEmail] = useState('')
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [isSubmitted, setIsSubmitted] = useState(false)
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const containerRef = useRef(null)
+  
+  const { scrollY } = useScroll()
+  const y1 = useTransform(scrollY, [0, 500], [0, 150])
+  const y2 = useTransform(scrollY, [0, 500], [0, -150])
+  const opacity = useTransform(scrollY, [0, 300], [1, 0])
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePosition({
+        x: (e.clientX / window.innerWidth - 0.5) * 2,
+        y: (e.clientY / window.innerHeight - 0.5) * 2
+      })
+    }
+    window.addEventListener('mousemove', handleMouseMove)
+    return () => window.removeEventListener('mousemove', handleMouseMove)
+  }, [])
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (email) {
-      setIsSubmitted(true)
-    }
+    setIsSubmitted(true)
   }
 
   return (
-    <div className="min-h-screen bg-background-primary relative">
-      {/* Subtle grid background */}
-      <div className="absolute inset-0 bg-grid opacity-50" />
-      <div className="absolute inset-0 scanlines pointer-events-none" />
+    <div ref={containerRef} className="min-h-screen bg-black relative overflow-hidden">
+      {/* Animated grid */}
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] [background-size:60px_60px] [transform:perspective(500px)_rotateX(60deg)] [transform-origin:top] opacity-40" />
+      </div>
       
-      {/* Ambient glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-white/[0.01] rounded-full blur-3xl pointer-events-none" />
+      {/* Floating geometric shapes */}
+      <motion.div 
+        style={{ y: y1, x: mousePosition.x * 20 }}
+        className="absolute top-20 left-[10%] w-px h-40 bg-gradient-to-b from-transparent via-white/20 to-transparent"
+      />
+      <motion.div 
+        style={{ y: y2, x: mousePosition.x * -20 }}
+        className="absolute top-40 right-[15%] w-24 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"
+      />
+      <motion.div 
+        style={{ x: mousePosition.x * 30, y: mousePosition.y * 30 }}
+        className="absolute top-1/3 left-1/4 w-2 h-2 bg-white rounded-full opacity-60"
+      />
+      <motion.div 
+        style={{ x: mousePosition.x * -40, y: mousePosition.y * -40 }}
+        className="absolute bottom-1/3 right-1/4 w-1 h-1 bg-white rounded-full"
+      />
+      
+      {/* Corner accents */}
+      <div className="absolute top-0 left-0 w-20 h-20 border-l border-t border-white/20" />
+      <div className="absolute top-0 right-0 w-20 h-20 border-r border-t border-white/20" />
+      <div className="absolute bottom-0 left-0 w-20 h-20 border-l border-b border-white/20" />
+      <div className="absolute bottom-0 right-0 w-20 h-20 border-r border-b border-white/20" />
 
-      {/* Navigation */}
-      <nav className="relative z-10 border-b border-border">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      {/* Main content */}
+      <div className="relative z-10 min-h-screen flex flex-col">
+        {/* Header */}
+        <header className="flex justify-between items-center px-8 py-6">
           <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
             className="flex items-center gap-3"
           >
-            <div className="w-8 h-8 bg-white rounded flex items-center justify-center">
-              <span className="text-black font-bold text-sm">T</span>
+            <div className="w-8 h-8 border border-white/30 flex items-center justify-center">
+              <span className="font-mono text-sm">T</span>
             </div>
-            <span className="font-display text-lg font-semibold tracking-tight">TipsHub</span>
+            <span className="font-mono text-xs tracking-[0.2em] uppercase">TipsHub</span>
           </motion.div>
-
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-sm text-text-secondary hover:text-text-primary transition-smooth">Features</a>
-            <a href="#about" className="text-sm text-text-secondary hover:text-text-primary transition-smooth">About</a>
-            <a href="mailto:hello@tipshub.com" className="text-sm text-text-secondary hover:text-text-primary transition-smooth">Contact</a>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button 
-            className="md:hidden p-2 text-text-secondary hover:text-text-primary"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-        </div>
-
-        {/* Mobile Menu */}
-        {isMenuOpen && (
+          
           <motion.div 
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="md:hidden border-b border-border bg-background-secondary"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="font-mono text-xs text-white/40"
           >
-            <div className="flex flex-col p-6 gap-4">
-              <a href="#features" className="text-sm text-text-secondary">Features</a>
-              <a href="#about" className="text-sm text-text-secondary">About</a>
-              <a href="mailto:hello@tipshub.com" className="text-sm text-text-secondary">Contact</a>
-            </div>
+            0.1.0 // COMING SOON
           </motion.div>
-        )}
-      </nav>
+        </header>
 
-      {/* Main Content */}
-      <main className="relative z-10">
-        {/* Hero Section */}
-        <section className="py-24 md:py-32 px-6">
-          <div className="max-w-4xl mx-auto text-center">
+        {/* Hero */}
+        <main className="flex-1 flex flex-col justify-center items-center px-8">
+          <motion.div style={{ opacity }} className="text-center max-w-2xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
+              transition={{ duration: 0.8 }}
+              className="mb-6"
             >
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 border border-border rounded-full mb-8">
-                <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                <span className="text-xs text-text-muted uppercase tracking-wider">Coming Soon</span>
-              </div>
+              <span className="font-mono text-xs tracking-[0.3em] text-white/50 uppercase">
+                /// ONLINE EARNINGS DIRECTORY
+              </span>
             </motion.div>
-
+            
             <motion.h1 
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 leading-tight"
+              transition={{ duration: 0.8, delay: 0.1 }}
+              className="font-mono text-5xl md:text-7xl lg:text-8xl font-light tracking-tight mb-8 leading-[0.9]"
             >
-              Earn money online.<br />
-              <span className="text-text-secondary">The complete directory.</span>
+              <span className="block">EARN.</span>
+              <span className="block text-white/30">DIRECTORY.</span>
+              <span className="block">PROFIT.</span>
             </motion.h1>
-
+            
             <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-text-secondary text-lg md:text-xl max-w-2xl mx-auto mb-12"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="font-mono text-xs text-white/40 max-w-md mx-auto mb-12 leading-relaxed"
             >
-              A curated directory of verified earning platforms. 
-              Surveys, cashback, microtasks — all in one place.
+              Curated platforms for surveys, cashback, microtasks & referrals. 
+              All verified. All accessible.
             </motion.p>
 
-            {/* Email Signup */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="max-w-md mx-auto"
+              transition={{ duration: 0.8, delay: 0.5 }}
+              className="flex flex-col items-center gap-6"
             >
               {isSubmitted ? (
-                <div className="flex items-center justify-center gap-2 text-text-secondary">
-                  <CheckCircle size={20} />
-                  <span>We'll notify you when we launch.</span>
-                </div>
+                <motion.div 
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="font-mono text-xs text-white/60 tracking-wider"
+                >
+                  /// ACCESS REQUESTED
+                </motion.div>
               ) : (
-                <form onSubmit={handleSubmit} className="flex gap-2">
-                  <div className="flex-1 relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={18} />
-                    <input 
-                      type="email" 
-                      placeholder="Enter your email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="w-full pl-11 pr-4 py-3 bg-background-secondary border border-border rounded-lg focus:border-white/30 focus:outline-none transition-smooth text-white placeholder:text-text-muted"
-                    />
-                  </div>
+                <form onSubmit={handleSubmit} className="flex w-full max-w-sm">
+                  <input 
+                    type="email" 
+                    placeholder="email@domain"
+                    required
+                    className="flex-1 bg-transparent border-b border-white/20 py-3 px-2 font-mono text-sm text-white placeholder:text-white/30 focus:border-white/60 focus:outline-none transition-colors"
+                  />
                   <button 
                     type="submit"
-                    className="px-6 py-3 bg-white text-black font-medium rounded-lg hover:bg-gray-200 transition-smooth"
+                    className="font-mono text-xs text-white/60 hover:text-white transition-colors px-4 tracking-wider"
                   >
-                    Join
+                    JOIN_
                   </button>
                 </form>
               )}
-              <p className="text-xs text-text-muted mt-4">
-                Join 2,000+ others waiting for launch. No spam.
-              </p>
+              
+              <div className="flex gap-8 font-mono text-[10px] text-white/30">
+                <span>50+ PLATFORMS</span>
+                <span>///</span>
+                <span>6 CATEGORIES</span>
+                <span>///</span>
+                <span>VERIFIED</span>
+              </div>
             </motion.div>
+          </motion.div>
+        </main>
+
+        {/* Footer */}
+        <footer className="px-8 py-6 flex justify-between items-end">
+          <div className="font-mono text-[10px] text-white/20">
+            <div>NIGERIA FOCUS</div>
+            <div>LAFPS /// NG</div>
           </div>
-        </section>
-
-        {/* Features Section */}
-        <section id="features" className="py-20 px-6 border-t border-border">
-          <div className="max-w-6xl mx-auto">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="mb-12"
-            >
-              <h2 className="font-display text-2xl md:text-3xl font-semibold mb-4">What we're building</h2>
-              <p className="text-text-secondary max-w-xl">
-                A modern, fast directory to find legitimate ways to earn money online.
-              </p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <FeatureCard 
-                icon={Search}
-                title="Search & Filter"
-                description="Find platforms by earning type, payout method, minimum payout, and more."
-                delay={0.1}
-              />
-              <FeatureCard 
-                icon={Globe}
-                title="Nigeria Focus"
-                description="Special filters for Lagos and Nigeria availability. Know what's accessible."
-                delay={0.2}
-              />
-              <FeatureCard 
-                icon={Clock}
-                title="Last Verified"
-                description="Every platform checked for availability. No dead links or scams."
-                delay={0.3}
-              />
-              <FeatureCard 
-                icon={DollarSign}
-                title="Earnings Info"
-                description="Minimum payouts and average earnings reported by users."
-                delay={0.4}
-              />
-              <FeatureCard 
-                icon={TrendingUp}
-                title="Status Tracking"
-                description="Active, low-paying, or avoid. Know the current status of each platform."
-                delay={0.5}
-              />
-              <FeatureCard 
-                icon={ExternalLink}
-                title="Quick Signup"
-                description="One-click links to sign up. Get started instantly."
-                delay={0.6}
-              />
+          
+          <div className="font-mono text-[10px] text-white/20">
+            <div className="flex gap-4">
+              <a href="#" className="hover:text-white transition-colors">PRIVACY</a>
+              <a href="mailto:hello@tipshub.com" className="hover:text-white transition-colors">CONTACT</a>
             </div>
           </div>
-        </section>
+        </footer>
+      </div>
 
-        {/* Earning Methods Preview */}
-        <section className="py-20 px-6 border-t border-border">
-          <div className="max-w-6xl mx-auto">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="mb-12"
-            >
-              <h2 className="font-display text-2xl md:text-3xl font-semibold mb-4">Platforms by category</h2>
-              <p className="text-text-secondary max-w-xl">
-                Discover earning opportunities across multiple categories.
-              </p>
-            </motion.div>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <CategoryPill icon={Video} label="Surveys" />
-              <CategoryPill icon={Gift} label="Cashback" />
-              <CategoryPill icon={CreditCard} label="Microtasks" />
-              <CategoryPill icon={DollarSign} label="Referrals" />
-            </div>
-          </div>
-        </section>
-
-        {/* Stats */}
-        <section className="py-20 px-6 border-t border-border">
-          <div className="max-w-4xl mx-auto">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              <StatItem number="50+" label="Verified Platforms" />
-              <StatItem number="6" label="Categories" />
-              <StatItem number="4" label="Payout Methods" />
-              <StatItem number="100%" label="Curated" />
-            </div>
-          </div>
-        </section>
-
-        {/* About Section */}
-        <section id="about" className="py-20 px-6 border-t border-border">
-          <div className="max-w-2xl mx-auto text-center">
-            <h2 className="font-display text-2xl md:text-3xl font-semibold mb-6">Why TipsHub?</h2>
-            <p className="text-text-secondary leading-relaxed">
-              We built TipsHub because finding legitimate ways to earn money online is hard. 
-              Scams, dead links, and outdated information waste your time. 
-              We're building a curated, always-up-to-date directory so you can focus on earning.
-            </p>
-          </div>
-        </section>
-
-        {/* CTA */}
-        <section className="py-24 px-6 border-t border-border">
-          <div className="max-w-xl mx-auto text-center">
-            <h2 className="font-display text-2xl md:text-3xl font-semibold mb-4">Get early access</h2>
-            <p className="text-text-secondary mb-8">
-              Be the first to know when we launch. Early users get exclusive features.
-            </p>
-            <form onSubmit={handleSubmit} className="flex gap-2 max-w-md mx-auto">
-              {isSubmitted ? (
-                <div className="flex items-center justify-center gap-2 text-text-secondary py-3">
-                  <CheckCircle size={20} />
-                  <span>You're on the list!</span>
-                </div>
-              ) : (
-                <>
-                  <div className="flex-1 relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={18} />
-                    <input 
-                      type="email" 
-                      placeholder="Enter your email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="w-full pl-11 pr-4 py-3 bg-background-secondary border border-border rounded-lg focus:border-white/30 focus:outline-none transition-smooth text-white placeholder:text-text-muted"
-                    />
-                  </div>
-                  <button 
-                    type="submit"
-                    className="px-6 py-3 bg-white text-black font-medium rounded-lg hover:bg-gray-200 transition-smooth flex items-center gap-2"
-                  >
-                    Join <ChevronRight size={16} />
-                  </button>
-                </>
-              )}
-            </form>
-          </div>
-        </section>
-      </main>
-
-      {/* Footer */}
-      <footer className="relative z-10 py-8 px-6 border-t border-border">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-6 bg-white rounded flex items-center justify-center">
-              <span className="text-black font-bold text-xs">T</span>
-            </div>
-            <span className="text-sm text-text-muted">© 2026 TipsHub</span>
-          </div>
-          <div className="flex items-center gap-6 text-sm text-text-muted">
-            <a href="#" className="hover:text-text-primary transition-smooth">Privacy</a>
-            <a href="#" className="hover:text-text-primary transition-smooth">Terms</a>
-            <a href="mailto:hello@tipshub.com" className="hover:text-text-primary transition-smooth">Contact</a>
-          </div>
-        </div>
-      </footer>
+      {/* Scan line effect */}
+      <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.1)_50%)] bg-[length:100%_4px]" />
     </div>
-  )
-}
-
-function FeatureCard({ icon: Icon, title, description, delay }) {
-  return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay }}
-      className="p-6 bg-background-secondary border border-border rounded-xl hover:border-border-light transition-smooth group"
-    >
-      <Icon className="w-5 h-5 text-text-muted mb-4 group-hover:text-text-primary transition-smooth" />
-      <h3 className="font-medium text-text-primary mb-2">{title}</h3>
-      <p className="text-sm text-text-secondary leading-relaxed">{description}</p>
-    </motion.div>
-  )
-}
-
-function CategoryPill({ icon: Icon, label }) {
-  return (
-    <motion.div 
-      whileHover={{ scale: 1.02 }}
-      className="flex items-center gap-2 px-4 py-3 bg-background-secondary border border-border rounded-lg hover:border-border-light transition-smooth"
-    >
-      <Icon className="w-4 h-4 text-text-muted" />
-      <span className="text-sm text-text-secondary">{label}</span>
-    </motion.div>
-  )
-}
-
-function StatItem({ number, label }) {
-  return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      className="text-center"
-    >
-      <div className="font-display text-3xl md:text-4xl font-semibold mb-1">{number}</div>
-      <div className="text-sm text-text-muted">{label}</div>
-    </motion.div>
   )
 }
 

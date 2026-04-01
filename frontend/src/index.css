@@ -14,8 +14,6 @@ html {
 
 body {
   font-family: 'JetBrains Mono', monospace;
-  background-color: #000;
-  color: #fff;
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -29,19 +27,18 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(128, 128, 128, 0.3);
 }
 
 ::selection {
-  background: rgba(255, 255, 255, 0.2);
-  color: #fff;
+  background: rgba(128, 128, 128, 0.3);
 }
 
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0 1000px #000 inset !important;
-  -webkit-text-fill-color: #fff !important;
+  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+  -webkit-text-fill-color: inherit !important;
 }
 
 @keyframes noise {

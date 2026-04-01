@@ -82,7 +82,7 @@ function App() {
             <motion.div 
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              className={`font-mono text-xs ${isDark ? 'text-white/40' : 'text-black/40'}`}
+              className={`font-mono text-xs ${isDark ? 'text-white/40' : 'text-black/40'} hidden md:block`}
             >
               0.1.0 // COMING SOON
             </motion.div>

@@ -10,6 +10,9 @@ env/
 dist/
 build/
 *.log
+__pycache__/
+*.py[cod]
+*$py.class
 
 # Environment
 .env

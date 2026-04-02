@@ -7,20 +7,33 @@ function App() {
   const [isDark, setIsDark] = useState(true)
   const containerRef = useRef(null)
   
+  useEffect(() => {
+    setIsDark(window.innerWidth < 768)
+  }, [])
+  
   const { scrollY } = useScroll()
   const y1 = useTransform(scrollY, [0, 500], [0, 150])
   const y2 = useTransform(scrollY, [0, 500], [0, -150])
   const opacity = useTransform(scrollY, [0, 300], [1, 0])
 
   useEffect(() => {
+    const handleResize = () => {
+      setIsDark(window.innerWidth < 768)
+    }
+    
     const handleMouseMove = (e) => {
       setMousePosition({
         x: (e.clientX / window.innerWidth - 0.5) * 2,
         y: (e.clientY / window.innerHeight - 0.5) * 2
       })
     }
+    
+    window.addEventListener('resize', handleResize)
     window.addEventListener('mousemove', handleMouseMove)
-    return () => window.removeEventListener('mousemove', handleMouseMove)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      window.removeEventListener('mousemove', handleMouseMove)
+    }
   }, [])
 
   const handleSubmit = (e) => {
